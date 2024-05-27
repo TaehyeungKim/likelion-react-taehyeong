@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getComments } from "../../apis/api";
+import { getComments, createComment } from "../../apis/api";
 import CommentElement from "./CommentElement";
 
 const Comment = ({ postId }) => {
@@ -8,21 +8,11 @@ const Comment = ({ postId }) => {
 
   const handleCommentSubmit = (e) => {
     e.preventDefault();
-    setCommentList([
-      // TODO: add api call for creating comment
-      ...commentList,
-      {
-        id: commentList.length + 1,
-        content: newContent,
-        created_at: new Date().toISOString(),
-        post: postId,
-        author: {
-          id: 1,
-          username: "user1",
-        },
-      },
-    ]);
-    console.log({
+    const createCommentAPI = async (data) => {
+      await createComment(data);
+      return;
+    };
+    createCommentAPI({
       post: postId,
       content: newContent,
     });
@@ -35,11 +25,11 @@ const Comment = ({ postId }) => {
   };
 
   useEffect(() => {
-    const commentAPI = async (postId) => {
+    const getCommentAPI = async (postId) => {
       const comments = await getComments(postId);
       setCommentList(comments);
     };
-    commentAPI(postId);
+    getCommentAPI(postId);
   }, [postId]);
 
   return (
