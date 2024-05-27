@@ -63,7 +63,16 @@ export const deletePost = async (id, navigate) => {
 };
 
 // 과제!!
-export const likePost = async (postId) => {};
+export const likePost = async (postId) => {
+  const response = await instanceWithToken.post(`post/${postId}/like/`);
+  if (response.status === 200) {
+    console.log("LIKE PROPERLY WORKED");
+    window.location.reload();
+  } else {
+    console.log("[ERROR] error while like");
+  }
+  return response.data;
+};
 
 // Tag 관련 API들
 export const getTags = async () => {
