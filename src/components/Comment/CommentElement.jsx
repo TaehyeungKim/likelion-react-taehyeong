@@ -23,7 +23,8 @@ const CommentElement = (props) => {
     setIsEdit(!isEdit);
     const updateCommentAPI = async (id, data) => {
       const res = await updateComment(id, data);
-      return res;
+      if (res.status === 200) setContent(res.data.content);
+      else window.alert("댓글 수정 중 에러 발생");
     };
     updateCommentAPI(comment.id, { content: onChangeValue });
   };

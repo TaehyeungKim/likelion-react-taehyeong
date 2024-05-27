@@ -1,15 +1,22 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { likePost } from "../../apis/api";
+import { getCookie } from "../../utils/cookie";
 
-export const SmallPost = ({ post }) => {
-  const onClickLike = (e) => {
-    e.preventDefault(); // Link 클릭 이벤트 막기
+const onClickLike = (postId, callback) => (e) => {
+  e.preventDefault();
+  if (getCookie("access_token")) {
     const likeAPI = async (postId) => {
       const res = await likePost(postId);
-      console.log(res);
+      if (res.status === 200) callback(res.data.like_users.length);
+      else window.alert("좋아요 중 에러 발생");
     };
-    likeAPI(post.id);
-  };
+    likeAPI(postId);
+  }
+};
+
+export const SmallPost = ({ post }) => {
+  const [likeUsers, setLikeUsers] = useState(post.like_users.length);
 
   return (
     <Link
@@ -28,19 +35,16 @@ export const SmallPost = ({ post }) => {
       <button
         type="button"
         className="bg-transparent border-none cursor-pointer"
-        onClick={onClickLike}
+        onClick={onClickLike(post.id, setLikeUsers)}
       >
-        ❤️ {post.like_users.length}
+        ❤️ {likeUsers}
       </button>
     </Link>
   );
 };
 
 export const BigPost = ({ post }) => {
-  const onClickLike = () => {
-    alert("나도 좋아!");
-    // add api call for liking post here
-  };
+  const [likeUsers, setLikeUsers] = useState(post.like_users.length);
 
   return (
     <div className="flex flex-col px-8 py-5 w-full bg-orange-400 ring-4 ring-orange-300 rounded-xl gap-5">
@@ -66,9 +70,9 @@ export const BigPost = ({ post }) => {
       <button
         type="button"
         className="self-start text-black bg-transparent border-none cursor-pointer mt-2"
-        onClick={onClickLike}
+        onClick={onClickLike(post.id, setLikeUsers)}
       >
-        ❤️ {post.like_users.length}
+        ❤️ {likeUsers}
       </button>
     </div>
   );

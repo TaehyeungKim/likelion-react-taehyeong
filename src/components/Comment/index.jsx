@@ -1,29 +1,38 @@
 import { useState, useEffect } from "react";
 import { getComments, createComment, deleteComment } from "../../apis/api";
 import CommentElement from "./CommentElement";
+import { getCookie } from "../../utils/cookie";
 
-const Comment = ({ postId, user }) => {
+const Comment = ({ postId }) => {
   const [commentList, setCommentList] = useState([]); // state for comments
   const [newContent, setNewContent] = useState(""); // state for new comment
 
-  const handleCommentSubmit = (e) => {
+  const handleCommentSubmit = (callback) => (e) => {
     e.preventDefault();
-    const createCommentAPI = async (data) => {
-      await createComment(data);
-      return;
-    };
-    createCommentAPI({
-      post: postId,
-      content: newContent,
-    });
-    setNewContent("");
+    if (getCookie("access_token")) {
+      const createCommentAPI = async (data) => {
+        const res = await createComment(data);
+        if (res.status === 201) callback([...commentList, res.data]);
+        else window.alert("댓글 등록 중 에러 발생");
+      };
+
+      createCommentAPI({
+        post: postId,
+        content: newContent,
+      });
+      setNewContent("");
+    }
   };
 
   const handleCommentDelete = (commentId) => {
     if (window.confirm("정말로 댓글을 삭제하시겠습니까?")) {
       const deleteCommentAPI = async (commentId) => {
-        await deleteComment(commentId);
-        return;
+        const res = await deleteComment(commentId);
+        if (res)
+          setCommentList(
+            commentList.filter((comment) => comment.id !== commentId)
+          );
+        else window.alert("댓글 삭제 중 에러 발생");
       };
       deleteCommentAPI(commentId);
     }
@@ -31,8 +40,10 @@ const Comment = ({ postId, user }) => {
 
   useEffect(() => {
     const getCommentAPI = async (postId) => {
-      const comments = await getComments(postId);
-      setCommentList(comments);
+      const res = await getComments(postId);
+
+      if (res.status === 200) setCommentList(res.data);
+      else window.alert("댓글 불러오기 중 에러 발생");
     };
     getCommentAPI(postId);
   }, [postId]);
@@ -53,7 +64,7 @@ const Comment = ({ postId, user }) => {
 
       <form
         className="flex flex-row mt-10 gap-3"
-        onSubmit={handleCommentSubmit}
+        onSubmit={handleCommentSubmit(setCommentList)}
       >
         <input
           type="text"
