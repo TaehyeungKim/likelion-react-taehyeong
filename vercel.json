@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://django-seminar-week11-taehyeong.fly.dev/api/:path*"
+    },
+    {
+      "source": "/api/:path*/",
+      "destination": "https://django-seminar-week11-taehyeong.fly.dev/api/:path*/"
+    }
+  ]
+}

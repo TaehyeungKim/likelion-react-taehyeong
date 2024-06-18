@@ -40,5 +40,6 @@
   },
   "devDependencies": {
     "tailwindcss": "^3.4.1"
-  }
+  },
+  "proxy": "https://django-seminar-week11-taehyeong.fly.dev/"
 }
