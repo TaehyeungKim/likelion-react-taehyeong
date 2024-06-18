@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { BigPost } from "../components/Posts";
 import Comment from "../components/Comment";
 
-import { getPost, getUser, deletePost } from "../apis/api";
-import { getCookie } from "../utils/cookie";
+import { getPost, deletePost } from "../apis/api";
+import { UserContext } from "../App";
 
 const PostDetailPage = () => {
-  const { postId } = useParams();
+  const user = useContext(UserContext);
 
-  const [user, setUser] = useState();
+  const { postId } = useParams();
 
   const [post, setPost] = useState(null);
   useEffect(() => {
@@ -19,17 +19,6 @@ const PostDetailPage = () => {
     };
     getPostAPI();
   }, [postId]);
-
-  useEffect(() => {
-    // access_token이 있으면 유저 정보 가져옴
-    if (getCookie("access_token")) {
-      const getUserAPI = async () => {
-        const user = await getUser();
-        setUser(user);
-      };
-      getUserAPI();
-    }
-  }, []);
 
   const navigate = useNavigate();
   const onClickDelete = () => {
@@ -42,7 +31,7 @@ const PostDetailPage = () => {
       <div className="flex flex-col items-center w-[60%] p-8">
         <BigPost post={post} />
 
-        <Comment postId={postId} />
+        <Comment postId={postId} user={user} />
         <div className="flex flex-row gap-3">
           {user?.id === post?.author.id ? (
             <>
